@@ -134,11 +134,9 @@ def change_item(start):
 
 
 # 3초마다 알려주는 함수
-def time_check(start_time, second=3.0):
-    if time() - start_time >= second:
-        return True
-    else:
-        return False
+def time_check():
+    second = 3.0
+    return True
 
     threading.Timer(second, time_check, [second]).start()
 
@@ -246,7 +244,7 @@ while 1:
     # 시간측정용 변수
     start_time = time()
     print(start_time)
-    time_check(start_time)
+    # time_check(start_time)
 
     xr, yr, wr, hr = 0, 0, 0, 0
     ret, frame = video.read()
@@ -311,7 +309,7 @@ while 1:
         item, item_mask, item_mask_inv, item_flag = create_random_item()
     '''
 
-    print(time_check(start_time))
+    print(time_check())
 
     if random_x < last_point_x < (random_x + 40) and random_y < last_point_y < (random_y + 40):
         # 아이템 구분하는 flag 변수
@@ -394,7 +392,7 @@ video.release()
 cv2.destroyAllWindows()
 # 색상은 (B, G, R)로 표현!
 cv2.putText(frame, str("Game Over!"), (50, 230), font, 3, (0, 0, 255), 3, cv2.LINE_AA)
-cv2.putText(frame, str("Press any key to Exit."), (140, 280), font, 1, (255, 200, 0), 2, cv2.LINE_AA)
+cv2.putText(frame, str("Press any key to Exit"), (140, 280), font, 1, (0, 228, 255), 2, cv2.LINE_AA)
 cv2.imshow("frame", frame)
 k = cv2.waitKey(0)
 cv2.destroyAllWindows()
