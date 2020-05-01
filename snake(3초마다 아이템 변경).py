@@ -113,7 +113,7 @@ count = 0
 def score_decrease(second = 10.0):
     global end, score, count
     if end:
-        return
+        return None
     if count != 0:
         score -= 10
     count += 1
@@ -127,7 +127,7 @@ def score_decrease(second = 10.0):
 def expired_item(second=3.0):
     global item, item_mask, item_mask_inv, item_flag, random_x, random_y
     if end:
-        return
+        return None
     print('random 함수 호출')
     item, item_mask, item_mask_inv, item_flag = create_random_item()
     random_x = random.randint(10, 550)
@@ -286,7 +286,9 @@ while True:
                 break
 
     blank_img = np.zeros((480, 640, 3), np.uint8)
-
+    
+    # 테두리에 닿으면 게임오버 기능 구현
+    
     for i, j in enumerate(points):
         if i == 0:
             continue

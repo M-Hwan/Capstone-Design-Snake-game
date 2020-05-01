@@ -173,7 +173,7 @@ video = cv2.VideoCapture(0)
 kernel_erode = np.ones((4, 4), np.uint8)
 kernel_close = np.ones((15, 15), np.uint8)
 # 딱풀 색 설정
-color = 'red'
+color = 'yellow'
 rgb = webcolors.name_to_rgb(color)
 red = rgb.red
 blue = rgb.blue
