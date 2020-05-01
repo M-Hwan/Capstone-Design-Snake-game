@@ -1,36 +1,34 @@
 # _*_ coding:utf-8 _*_
+# 명환
 import cv2
 import numpy as np
 from time import time
 import random
 import math
 import webcolors
-import threading
+import threading # 시간(초) 측정
 import os  # 파일 리스트 가져오기 위함
 
 # 과일 아이템이 들어있는 경로 지정
-# path_fruits = r"C:\Users\leemh\Desktop\opencv-snake-game-master\opencv-snake-game-master\images\fruits"
 path_fruits = r"images\fruits"
 file_list_fruits = os.listdir(path_fruits)  # 폴더에 있는 모든 파일명을 리스트 형태로 저장
 file_dir_list_fruits = []  # 사진별 상대경로를 담을 리스트
 
 # 음식 아이템이 들어있는 경로 지정
-# path_foods = r"C:\Users\leemh\Desktop\opencv-snake-game-master\opencv-snake-game-master\images\foods"
 path_foods = r"images\foods"
 file_list_foods = os.listdir(path_foods)  # 폴더에 있는 모든 파일명을 리스트 형태로 저장
 file_dir_list_foods = []  # 사진별 상대경로를 담을 리스트
 
 # 감점 아이템이 들어있는 경로 지정
-# path_bad = r"C:\Users\leemh\Desktop\opencv-snake-game-master\opencv-snake-game-master\images\bad_things"
 path_bad = r"images\bad_things"
 file_list_bad = os.listdir(path_bad)  # 폴더에 있는 모든 파일명을 리스트 형태로 저장
 file_dir_list_bad = []  # 사진별 상대경로를 담을 리스트
 
 # 게임종료 아이템이 들어있는 경로 지정
-# path_end = r"C:\Users\leemh\Desktop\opencv-snake-game-master\opencv-snake-game-master\images\game_end"
 path_end = r"images\game_end"
 file_list_end = os.listdir(path_end)  # 폴더에 있는 모든 파일명을 리스트 형태로 저장
 file_dir_list_end = []  # 사진별 상대경로를 담을 리스트
+
 
 # 과일 아이템 사진별 상대경로 만들기
 for i in range(len(file_list_fruits)):
@@ -52,20 +50,20 @@ for i in range(len(file_list_end)):
     real_path_end = path_end + '\\' + file_list_end[i]
     file_dir_list_end.append(real_path_end)
 
+'''
 print(file_dir_list_fruits)
 print(file_dir_list_foods)
 print(file_dir_list_bad)
 print(file_dir_list_end)
-# font = cv2.FONT_HERSHEY_COMPLEX_SMALL
-font = cv2.FONT_HERSHEY_DUPLEX
+'''
 
 '''
 cv2.imread는 파일경로에 한글과 같은 유니코드가 포함되어 있으면, 인식하지 못함.
 따라서,cv2.imdecode를 사용해야 함.
 '''
+font = cv2.FONT_HERSHEY_COMPLEX_SMALL
 
-
-# 랜덤으로 아이템 이미지 불러오고, 아이템별 액션 전달해주는 함수
+# 랜덤으로 아이템 이미지 불러오는 함수
 def create_random_item():
     # 아이템 구분하는 flag 변수
     # 0 = 50점 추가 / 1 = 100점 추가 / 2 = 50점 감소 / -1 = 게임종료
@@ -76,10 +74,7 @@ def create_random_item():
     bad_item = str(random.choice(file_dir_list_bad))
     end_item = str(random.choice(file_dir_list_end))
 
-    # selected_item = random.choice([fruits_item, foods_item, bad_item, end_item])
-    # 리스트 원소 개수 조절로 억지 확률조절(?)
-    selected_item = random.choice(
-        [fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
+    selected_item = random.choice([fruits_item, foods_item, bad_item, end_item])
 
     if selected_item == fruits_item:
         item_flag = 0
@@ -111,38 +106,38 @@ def create_random_item():
 
 
 # 시간 반복용 flag 변수
-end = False
+end = False # 점수가 0점 이하가 되면, 게임오버 되게 하는 변수
 count = 0
 
-
-# 일정 시간마다 점수 줄이는 함수
-def score_decrease(second=5.0):
+# 일정 시간마다 점수 감점 함수
+def score_decrease(second = 10.0):
     global end, score, count
-    if end == True:
-        return None
+    if end:
+        return
     if count != 0:
         score -= 10
     count += 1
 
-    threading.Timer(second, score_decrease, [second]).start()
-
-
-# 3초마다 아이템을 바꾸는 함수
-def change_item(start):
-    if time() - start >= 3:
-        pass
-
-
-# 3초마다 알려주는 함수
-def time_check(start_time):
-    if start_time:
-        return None
-    second = 3.0
-    return True
-
-    threading.Timer(second, time_check, [second]).start()
-
-
+    # 10초마다 score_decrease 함수 반복실행
+    print('timer 작동됨 1')
+    threading.Timer(second, score_decrease, [second]).start() 
+    print('timer 작동됨 2')
+     
+# 3초마다 아이템을 변경하는 함수
+def expired_item(second=3.0):
+    global item, item_mask, item_mask_inv, item_flag, random_x, random_y
+    if end:
+        return
+    print('random 함수 호출')
+    item, item_mask, item_mask_inv, item_flag = create_random_item()
+    random_x = random.randint(10, 550)
+    random_y = random.randint(10, 400)
+    print('변경됨')
+    
+    #3초마다 expired_item 함수 반복실행
+    print('timer 작동됨 3')
+    threading.Timer(second, expired_item, [second]).start()
+    print('timer 작동됨 4')
 ###################################################
 '''
 apple = cv2.imread("apple.png", -1)
@@ -169,11 +164,15 @@ lemon_mask_inv = cv2.resize(lemon_mask_inv, (40, 40), interpolation=cv2.INTER_AR
 '''
 blank_img = np.zeros((480, 640, 3), np.uint8)
 
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+# 비디오 사이즈 고정용
+video.set(3, 640)
+video.set(4, 480)
+
 kernel_erode = np.ones((4, 4), np.uint8)
 kernel_close = np.ones((15, 15), np.uint8)
 # 딱풀 색 설정
-color = 'red'
+color = 'yellow'
 rgb = webcolors.name_to_rgb(color)
 red = rgb.red
 blue = rgb.blue
@@ -190,9 +189,6 @@ def color_convert(r, bl, g):
     lower_upper.append([hue - 10, 100, 100])
     lower_upper.append([hue + 10, 255, 255])
     return lower_upper
-
-
-#############################################################
 
 def detect_color(h):
     lu = color_convert(red, blue, green)
@@ -224,30 +220,27 @@ def intersect(p, q, r, s):
 
     return False
 
-
+##############################################
 start_time = int(time())
 q, snake_len, score, temp = 0, 200, 0, 1
 point_x, point_y = 0, 0
 last_point_x, last_point_y, dist, length = 0, 0, 0, 0
 points = []
 list_len = []
-random_x = random.randint(10, 550)
-random_y = random.randint(10, 400)
+#random_x = random.randint(10, 550)
+#random_y = random.randint(10, 400)
 a, b, c, d = [], [], [], []
 ################# 추가 2 ###############
-item, item_mask, item_mask_inv, item_flag = create_random_item()
+#item, item_mask, item_mask_inv, item_flag = create_random_item()
 
 #########################################
 
 # 10초마다 점수 감소하도록 조절
-score_decrease(10)
+score_decrease()
+# 3초마다 아이템 변경되도록 조절
+expired_item()
 
-while 1:
-    # 시간측정용 변수
-    start_time = time()
-    print(start_time)
-    # time_check(start_time)
-
+while True:
     xr, yr, wr, hr = 0, 0, 0, 0
     ret, frame = video.read()
     frame = cv2.flip(frame, 1)
@@ -257,7 +250,6 @@ while 1:
         q = 1
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    #########################################################################
     mask = detect_color(hsv)
     # finding contours
     contour, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -298,24 +290,11 @@ while 1:
     for i, j in enumerate(points):
         if i == 0:
             continue
+        # 라인 그리는 부분
         cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (blue, green, red), 5)
     cv2.circle(blank_img, (last_point_x, last_point_y), 5, (10, 200, 150), -1)
     ################################################################
-
-    '''
-    # 3초마다 아이템 변경 구현할 것!
-    # 추가본
-    if (time() - time_count) >= 3:
-        random_x = random.randint(10, 550)
-        random_y = random.randint(10, 400)
-        item, item_mask, item_mask_inv, item_flag = create_random_item()
-    '''
-
-    print(time_check(start_time))
-
     if random_x < last_point_x < (random_x + 40) and random_y < last_point_y < (random_y + 40):
-        # 아이템 구분하는 flag 변수
-        # 0 = 50점 추가 / 1 = 100점 추가 / 2 = 50점 감소 / -1 = 게임종료
         if item_flag == 0:
             score += 50
         elif item_flag == 1:
@@ -327,14 +306,10 @@ while 1:
 
         random_x = random.randint(10, 550)
         random_y = random.randint(10, 400)
-
         ######################## 추가 3 ############
         item, item_mask, item_mask_inv, item_flag = create_random_item()  # 점수가 오를때마다,랜덤 아이템 생성 함수 호출
         ############################################
-
-    # 샤론님 에러 부분
     frame = cv2.add(frame, blank_img)
-
     '''
     roi = frame[random_y:random_y+40, random_x:random_x+40]
     img_bg = cv2.bitwise_and(roi, roi, mask=apple_mask_inv)
@@ -387,14 +362,12 @@ while 1:
         break
 
 ############################################################################
-# Threading 종료용 변수
+# Threading 함수용 end 변수
 end = True
-
 video.release()
 cv2.destroyAllWindows()
-# 색상은 (B, G, R)로 표현!
-cv2.putText(frame, str("Game Over!"), (50, 230), font, 3, (0, 0, 255), 3, cv2.LINE_AA)
-cv2.putText(frame, str("Press any key to Exit"), (140, 280), font, 1, (0, 228, 255), 2, cv2.LINE_AA)
+cv2.putText(frame, str("Game Over!"), (100, 230), font, 3, (255, 0, 0), 3, cv2.LINE_AA)
+cv2.putText(frame, str("Press any key to Exit."), (180, 260), font, 1, (255, 200, 0), 2, cv2.LINE_AA)
 cv2.imshow("frame", frame)
 k = cv2.waitKey(0)
 cv2.destroyAllWindows()
