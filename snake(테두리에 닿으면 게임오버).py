@@ -61,7 +61,8 @@ print(file_dir_list_end)
 cv2.imread는 파일경로에 한글과 같은 유니코드가 포함되어 있으면, 인식하지 못함.
 따라서,cv2.imdecode를 사용해야 함.
 '''
-font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+# font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+font = cv2.FONT_HERSHEY_DUPLEX
 
 # 랜덤으로 아이템 이미지 불러오는 함수
 def create_random_item():
@@ -74,7 +75,7 @@ def create_random_item():
     bad_item = str(random.choice(file_dir_list_bad))
     end_item = str(random.choice(file_dir_list_end))
 
-    selected_item = random.choice([fruits_item, foods_item, bad_item, end_item])
+    selected_item = random.choice([fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
 
     if selected_item == fruits_item:
         item_flag = 0
@@ -164,7 +165,7 @@ lemon_mask_inv = cv2.resize(lemon_mask_inv, (40, 40), interpolation=cv2.INTER_AR
 '''
 blank_img = np.zeros((480, 640, 3), np.uint8)
 
-video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+video = cv2.VideoCapture(0) #, cv2.CAP_DSHOW)
 # 비디오 사이즈 고정용
 video.set(3, 640)
 video.set(4, 480)
@@ -240,6 +241,8 @@ score_decrease()
 # 3초마다 아이템 변경되도록 조절
 expired_item()
 
+# 테두리 그리기!
+
 while True:
     xr, yr, wr, hr = 0, 0, 0, 0
     ret, frame = video.read()
@@ -262,7 +265,16 @@ while True:
     except:
         pass
 
+    print('xr: %d, yr: %d, wr: %d, hr: %d' % (xr, yr, wr, hr))
+
     cv2.rectangle(frame, (xr, yr), (xr + wr, yr + hr), (0, 0, 255), 2)
+    # 플레이 화면에 테두리 그리기
+    cv2.rectangle(frame, (0, 0), (640, 480), (255, 0, 0), 10)
+
+    # 테두리에 닿으면 게임오버(?)
+    # xr, yr = x, y 좌표 / wr, hr = 사각형의 너비, 높이
+    if (xr + wr) >= 640 or xr <= 0 or (yr + hr) >= 480 or yr <= 0:
+        break
 
     point_x = int(xr + (wr / 2))
     point_y = int(yr + (hr / 2))
@@ -335,7 +347,7 @@ while True:
     img_fg = cv2.bitwise_and(item, item, mask=item_mask)
     dst = cv2.add(img_bg, img_fg)
     frame[random_y:random_y + 40, random_x:random_x + 40] = dst
-    cv2.putText(frame, str("Score - " + str(score)), (250, 450), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(frame, str("Score - " + str(score)), (240, 450), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
     ##########################################
 
     if len(points) > 5:
@@ -364,12 +376,14 @@ while True:
         break
 
 ############################################################################
-# Threading 함수용 end 변수
+# Threading 종료용 변수
 end = True
+
 video.release()
 cv2.destroyAllWindows()
-cv2.putText(frame, str("Game Over!"), (100, 230), font, 3, (255, 0, 0), 3, cv2.LINE_AA)
-cv2.putText(frame, str("Press any key to Exit."), (180, 260), font, 1, (255, 200, 0), 2, cv2.LINE_AA)
+# 색상은 (B, G, R)로 표현!
+cv2.putText(frame, str("Game Over!"), (50, 230), font, 3, (0, 0, 255), 3, cv2.LINE_AA)
+cv2.putText(frame, str("Press any key to Exit"), (140, 280), font, 1, (0, 228, 255), 2, cv2.LINE_AA)
 cv2.imshow("frame", frame)
 k = cv2.waitKey(0)
 cv2.destroyAllWindows()

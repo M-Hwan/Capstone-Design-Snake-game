@@ -78,8 +78,7 @@ def create_random_item():
 
     # selected_item = random.choice([fruits_item, foods_item, bad_item, end_item])
     # 리스트 원소 개수 조절로 억지 확률조절(?)
-    selected_item = random.choice(
-        [fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
+    selected_item = random.choice([fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
 
     if selected_item == fruits_item:
         item_flag = 0
