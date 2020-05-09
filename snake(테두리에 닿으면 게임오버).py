@@ -98,7 +98,7 @@ def create_random_item():
     item = item[:, :, 0:3]
     # print('item')
     # print(item)
-    print(item_flag)
+    # print(item_flag)
 
     item = cv2.resize(item, (40, 40), interpolation=cv2.INTER_AREA)
     item_mask = cv2.resize(item_mask, (40, 40), interpolation=cv2.INTER_AREA)
@@ -120,25 +120,25 @@ def score_decrease(second = 10.0):
     count += 1
 
     # 10초마다 score_decrease 함수 반복실행
-    print('timer 작동됨 1')
+    # print('timer 작동됨 1')
     threading.Timer(second, score_decrease, [second]).start() 
-    print('timer 작동됨 2')
+    # print('timer 작동됨 2')
      
 # 3초마다 아이템을 변경하는 함수
 def expired_item(second=3.0):
     global item, item_mask, item_mask_inv, item_flag, random_x, random_y
     if end:
         return None
-    print('random 함수 호출')
+    # print('random 함수 호출')
     item, item_mask, item_mask_inv, item_flag = create_random_item()
     random_x = random.randint(10, 550)
     random_y = random.randint(10, 400)
-    print('변경됨')
+    # print('변경됨')
     
     #3초마다 expired_item 함수 반복실행
-    print('timer 작동됨 3')
+    # print('timer 작동됨 3')
     threading.Timer(second, expired_item, [second]).start()
-    print('timer 작동됨 4')
+    # print('timer 작동됨 4')
 ###################################################
 '''
 apple = cv2.imread("apple.png", -1)
@@ -150,22 +150,10 @@ print(apple)
 apple = cv2.resize(apple, (40, 40), interpolation=cv2.INTER_AREA)
 apple_mask = cv2.resize(apple_mask, (40, 40), interpolation=cv2.INTER_AREA)
 apple_mask_inv = cv2.resize(apple_mask_inv, (40, 40), interpolation=cv2.INTER_AREA)
-
-###############추가 부분
-lemon = cv2.imread("lemon.png", -1)
-lemon_mask = lemon[:, :, 2]
-lemon_mask_inv = cv2.bitwise_not(lemon_mask)
-lemon = lemon[:, :, 0:4]
-print('lemon')
-print(lemon)
-lemon = cv2.resize(lemon, (40, 40), interpolation=cv2.INTER_AREA)
-lemon_mask = cv2.resize(lemon_mask, (40, 40), interpolation=cv2.INTER_AREA)
-lemon_mask_inv = cv2.resize(lemon_mask_inv, (40, 40), interpolation=cv2.INTER_AREA)
-###############
 '''
 blank_img = np.zeros((480, 640, 3), np.uint8)
 
-video = cv2.VideoCapture(0) #, cv2.CAP_DSHOW)
+video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 # 비디오 사이즈 고정용
 video.set(3, 640)
 video.set(4, 480)
@@ -228,12 +216,11 @@ point_x, point_y = 0, 0
 last_point_x, last_point_y, dist, length = 0, 0, 0, 0
 points = []
 list_len = []
-#random_x = random.randint(10, 550)
-#random_y = random.randint(10, 400)
+random_x = random.randint(10, 550)
+random_y = random.randint(10, 400)
 a, b, c, d = [], [], [], []
 ################# 추가 2 ###############
-#item, item_mask, item_mask_inv, item_flag = create_random_item()
-
+item, item_mask, item_mask_inv, item_flag = create_random_item()
 #########################################
 
 # 10초마다 점수 감소하도록 조절
@@ -241,7 +228,6 @@ score_decrease()
 # 3초마다 아이템 변경되도록 조절
 expired_item()
 
-# 테두리 그리기!
 
 while True:
     xr, yr, wr, hr = 0, 0, 0, 0
@@ -266,18 +252,15 @@ while True:
         pass
 
     print('xr: %d, yr: %d, wr: %d, hr: %d' % (xr, yr, wr, hr))
-
+    
+    # 플레이 오브젝트 인식선 그리기
     cv2.rectangle(frame, (xr, yr), (xr + wr, yr + hr), (0, 0, 255), 2)
     # 플레이 화면에 테두리 그리기
     cv2.rectangle(frame, (0, 0), (640, 480), (255, 0, 0), 10)
 
-    # 테두리에 닿으면 게임오버(?)
-    # xr, yr = x, y 좌표 / wr, hr = 사각형의 너비, 높이
-    if (xr + wr) >= 640 or xr <= 0 or (yr + hr) >= 480 or yr <= 0:
-        break
-
     point_x = int(xr + (wr / 2))
     point_y = int(yr + (hr / 2))
+
 
     dist = int(math.sqrt(pow((last_point_x - point_x), 2) + pow((last_point_y - point_y), 2)))
     ##########
@@ -298,8 +281,7 @@ while True:
                 break
 
     blank_img = np.zeros((480, 640, 3), np.uint8)
-    
-    # 테두리에 닿으면 게임오버 기능 구현
+
     
     for i, j in enumerate(points):
         if i == 0:
@@ -322,6 +304,9 @@ while True:
         random_y = random.randint(10, 400)
         ######################## 추가 3 ############
         item, item_mask, item_mask_inv, item_flag = create_random_item()  # 점수가 오를때마다,랜덤 아이템 생성 함수 호출
+        # 아이템을 먹을 시, 뱀 몸통이 길어짐
+        snake_len += 40
+        # start_time = int(time())
         ############################################
     frame = cv2.add(frame, blank_img)
     '''
@@ -347,8 +332,12 @@ while True:
     img_fg = cv2.bitwise_and(item, item, mask=item_mask)
     dst = cv2.add(img_bg, img_fg)
     frame[random_y:random_y + 40, random_x:random_x + 40] = dst
-    cv2.putText(frame, str("Score - " + str(score)), (240, 450), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(frame, str("Score : " + str(score)), (240, 450), font, 1, (0, 0, 0), 2, cv2.LINE_AA)
     ##########################################
+    # 플레이시간 표시
+    # play_time = 'play time : ' + str(int(time())-start_time)
+    play_time = int(time() - start_time)
+    cv2.putText(frame, str('play time : ' + str(play_time)), (480, 50), font, 0.6, (0, 0, 0), 1, cv2.LINE_AA)
 
     if len(points) > 5:
 
@@ -365,15 +354,26 @@ while True:
 
     cv2.imshow("frame", frame)
 
+    # 시간마다 뱀 몸통 길이가 길어지는 것이 아니라, 아이템을 먹을 떄마다 길어지게 구현!
+    '''
     if (int(time()) - start_time) > 1:
         snake_len += 40
         start_time = int(time())
+    '''
     key = cv2.waitKey(1)
     if key == 27:
         break
     if score < 0:
         end = True
         break
+
+
+    # 테두리에 닿으면 게임오버
+    # xr, yr = x, y 좌표 / wr, hr = 사각형의 너비, 높이
+    if play_time >= 10:
+        if xr == 0 and yr == 0 and wr == 0 and hr == 0:
+            break
+
 
 ############################################################################
 # Threading 종료용 변수
