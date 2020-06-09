@@ -28,10 +28,10 @@ class Ui_Score(object):
     def setupUi(self, Score):
         
         Score.setObjectName("Score")
-        Score.resize(350, 600)    ##### 창 크기:(가로,세로)
+        Score.resize(370, 600)    ##### 창 크기:(가로,세로)
         self.tableWidget = QtWidgets.QTableWidget(Score)
         # 위젯 위치 조절(가로로 떨어진 거리, 세로로 떨어진 거리, 가로, 세로)
-        self.tableWidget.setGeometry(QtCore.QRect(10, 10, 335, 488)) 
+        self.tableWidget.setGeometry(QtCore.QRect(10, 10, 300, 400)) 
         self.tableWidget.setShowGrid(True)
         self.tableWidget.setCornerButtonEnabled(True)
         self.tableWidget.setRowCount(10) ############## 표의 행 갯수

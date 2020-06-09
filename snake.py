@@ -34,6 +34,7 @@ path_end = r"images\end_things"
 file_list_end = os.listdir(path_end)  # 폴더에 있는 모든 파일명을 리스트 형태로 저장
 file_dir_list_end = []  # 사진별 상대경로를 담을 리스트
 
+
 # 효과음이 들어있는 경로 지정
 path_sound = r"sound"
 file_list_sound = os.listdir(path_sound) # 폴더에 있는 모든 파일명을 리스트 형태로 저장
@@ -86,7 +87,8 @@ font = cv2.FONT_HERSHEY_DUPLEX
 def create_random_item():
     global selected_item, item_list
     # 아이템 구분하는 flag 변수
-    # 0 = 50점 추가 / 1 = 100점 추가 / 2 = 50점 감소 / -1 = 게임종료
+    # 0 = 50점 추가 / 1 = 100점 추가 / 2 = 50점 감소 / 3 = 100점 감소(shit) / -1 = 게임종료
+    # clown = 뱀 꼬리 100 증가 / ghost  = 유령 이미지 커지기 / axe = 점수 1/2 / poison = 테두리 줄이기
     item_flag = 0
 
     fruits_item = str(random.choice(file_dir_list_fruits))
@@ -94,16 +96,27 @@ def create_random_item():
     bad_item = str(random.choice(file_dir_list_bad))
     end_item = str(random.choice(file_dir_list_end))
 
-    selected_item = random.choice([fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
+    # selected_item = random.choice([fruits_item, fruits_item, fruits_item, foods_item, foods_item, bad_item, bad_item, end_item])
+    selected_item = random.choice([bad_item])
 
     if selected_item == fruits_item:
         item_flag = 0
     elif selected_item == foods_item:
         item_flag = 1
     elif selected_item == bad_item:
+        # if selected_item == 'shit.png':
+        #     item_flag = 3
+        # elif selected_item == 'axe.png':
+        #     item_flag = 4
+        # elif selected_item == 'clown.png':
+        #     item_flag = -2
+        # elif selected_item == 'ghost.png':
+        #     item_flag = -3
+        # else:
         item_flag = 2
     elif selected_item == end_item:
         item_flag = -1
+
 
     item = cv2.imdecode(np.fromfile(selected_item, np.uint8), -1)
     item_list = selected_item[18:]
@@ -178,18 +191,8 @@ def expired_item(second=3.0):
     # print('timer 작동됨 3')
     threading.Timer(second, expired_item, [second]).start()
     # print('timer 작동됨 4')
+
 ###################################################
-'''
-apple = cv2.imread("apple.png", -1)
-apple_mask = apple[:, :, 3]
-apple_mask_inv = cv2.bitwise_not(apple_mask)
-apple = apple[:, :, 0:3]
-print('apple')
-print(apple)
-apple = cv2.resize(apple, (40, 40), interpolation=cv2.INTER_AREA)
-apple_mask = cv2.resize(apple_mask, (40, 40), interpolation=cv2.INTER_AREA)
-apple_mask_inv = cv2.resize(apple_mask_inv, (40, 40), interpolation=cv2.INTER_AREA)
-'''
 #blank_img = np.zeros((480, 640, 3), np.uint8)
 blank_img = np.zeros((720, 1280, 3), np.uint8)
 
@@ -229,11 +232,14 @@ pygame.mixer.music.play()
 kernel_erode = np.ones((4, 4), np.uint8)
 kernel_close = np.ones((15, 15), np.uint8)
 # 딱풀 색 설정
-color = 'yellow'
-rgb = webcolors.name_to_rgb(color)
+# color = 'yellow'
+rgb = webcolors.name_to_rgb(u'yellow')
 red = rgb.red
 blue = rgb.blue
 green = rgb.green
+# red = random.randint(0,255)
+# blue = random.randint(0,255)
+# green = random.randint(0,255)
 
 lower_upper = []
 
@@ -279,7 +285,8 @@ def intersect(p, q, r, s):
 
 ##############################################
 start_time = int(time())
-q, snake_len, score, temp = 0, 200, 0, 1
+# q, snake_len, score, temp = 0, 200, 0, 1
+q, snake_len, score, temp = 0, 200, 500, 1
 point_x, point_y = 0, 0
 last_point_x, last_point_y, dist, length = 0, 0, 0, 0
 points = []
@@ -298,6 +305,17 @@ item, item_mask, item_mask_inv, item_flag = create_random_item()
 score_decrease()
 # 3초마다 아이템 변경되도록 조절
 expired_item()
+
+# 화면 가리는 유령 이미지 read
+disturb = cv2.imdecode(np.fromfile(r'images\re_ghost_opacity.png', np.uint8), -1)
+disturb_list = disturb.shape  # 이미지의 3차원 배열을 변수에 저장
+disturb_number = int(disturb_list[2]) - 1
+disturb_mask = disturb[:, :, disturb_number]
+disturb_mask_inv = cv2.bitwise_not(disturb_mask)
+disturb = disturb[:, :, 0:3]
+disturb = cv2.resize(disturb, (700, 700), interpolation=cv2.INTER_AREA)
+disturb_mask = cv2.resize(disturb_mask, (700, 700), interpolation=cv2.INTER_AREA)
+disturb_mask_inv = cv2.resize(disturb_mask_inv, (700, 700), interpolation=cv2.INTER_AREA)
 
 
 while True:
@@ -371,6 +389,10 @@ while True:
         # 1~4 랜덤 난수 생성(효과음 랜덤 재생시 필요)
         ab = randint(1, 4)
         ab = str(ab)
+        
+        # 아이템 구분하는 flag 변수
+        # 0 = 50점 추가 / 1 = 100점 추가 / 2 = 50점 감소 / 3 = 100점 감소(shit) / -1 = 게임종료
+        # clown = 뱀 꼬리 100 증가 / ghost  = 유령 이미지 커지기 / axe = 점수 1/2 / poison = 테두리 줄이기
         if item_flag == 0:
             good_sound_list = good_sound[ab]
             good_sound_list.play()
@@ -380,19 +402,40 @@ while True:
             good_sound_list.play()
             score += 100
         elif item_flag == 2:
-            if item_list == 'clown.png':
-                clown_sound.play()
-            elif item_list == 'ghost.png':
+            if item_list == 'ghost.png':
                 ghost_sound.play()
+                ghost_time = int(time())
+                while time() - ghost_time <= 3:
+                    # 유령그림 띄우는 건 해결, 3초동안 유지시키는 게 문제...
+                    disturb_roi = frame[10:710, 250:950]
+                    disturb_bg = cv2.bitwise_and(disturb_roi, disturb_roi, mask=disturb_mask_inv)
+                    disturb_fg = cv2.bitwise_and(disturb, disturb, mask=disturb_mask)
+                    disturb_dst = cv2.add(disturb_bg, disturb_fg)
+                    frame[10:710, 250:950] = disturb_dst
             elif item_list == 'shit.png':
                 shit_sound.play()
-            score -= 50
+                score -= 100
+            elif item_list == 'axe.png':
+                shit_sound.play()
+                score //= 2
+            elif item_list == 'clown.png':
+                clown_sound.play()
+                snake_len += 100
+            elif item_list == 'poison.png':
+                poison_time = int(time())
+                while (time() - poison_time) <= 3:
+                    cv2.rectangle(frame, (320, 180), (960, 540), (0, 0, 255), 10)
+                    #
+            else:
+                score -= 50
         elif item_flag == -1:
             if item_list == 'bomb.png':
                 bomb_sound.play()
             elif item_list == 'skeleton.png':
                 skeleton_sound.play()
             break
+
+
 
         '''
         random_x = random.randint(10, 550)
@@ -523,4 +566,4 @@ f = open('corpus_GUI.py','rt', encoding='UTF8')
 exec(f.read())
 f.close()
 print('k:' ,k)
-# cv2.destroyAllWindows()
+cv2.destroyAllWindows()
