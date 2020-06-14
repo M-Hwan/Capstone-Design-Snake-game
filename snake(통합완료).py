@@ -525,11 +525,23 @@ while True:
     # blank_img = np.zeros((480, 640, 3), np.uint8)
     blank_img = np.zeros((720, 1280, 3), np.uint8)
 
+    # for i, j in enumerate(points):
+    #     if i == 0:
+    #         continue
+    #     # 라인 그리는 부분
+    #     cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (blue, green, red), 5)
+    # cv2.circle(blank_img, (last_point_x, last_point_y), 5, (10, 200, 150), -1)
+
     for i, j in enumerate(points):
         if i == 0:
             continue
         # 라인 그리는 부분
-        cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (blue, green, red), 5)
+        # cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (blue, green, red), 5)
+        # cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (255,0,255), 5)
+        b = random.randint(0, 255)
+        g = random.randint(0, 255)
+        r = random.randint(0, 255)
+        cv2.line(blank_img, (points[i - 1][0], points[i - 1][1]), (j[0], j[1]), (b, g, r), 5)
     cv2.circle(blank_img, (last_point_x, last_point_y), 5, (10, 200, 150), -1)
     ################################################################
     if random_x < last_point_x < (random_x + 40) and random_y < last_point_y < (random_y + 40):
