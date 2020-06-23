@@ -11,6 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from game_rules import *
+from PyQt5.QtGui import QCursor, QIcon, QColor
 
 class Ui_Login(object):
 
@@ -59,12 +60,26 @@ class Ui_Login(object):
         return
         
     def setupUi(self, Login):
+        
+        # 윈도우 아이콘 설정
+        Login.setWindowIcon(QIcon('images\game_logo.png'))
         Login.setObjectName("Login")
         Login.resize(889, 770)
-  
+
+        
+        Login.setStyleSheet(
+        '''
+        background-image: url(images/back_2.png);
+        background-repeat: no-repeat;
+        '''
+        )
+        
+       
+        #background: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #30E8BF, stop: 1 #FF8235);
+        
         # start_button 속성 지정
         self.OK_button = QtWidgets.QPushButton(Login)
-        self.OK_button.setGeometry(QtCore.QRect(370, 690, 141, 60))
+        self.OK_button.setGeometry(QtCore.QRect(370, 690, 141, 65))
         self.OK_button.setObjectName("OK_button")
         font = QtGui.QFont()
         font.setPointSize(17)
@@ -79,10 +94,13 @@ class Ui_Login(object):
         self.OK_button.setStyleSheet(
         '''
         QPushButton { color:white; background:rgb(175, 215, 85);
-        border:5px solid rgb(170, 255, 127); border-style:outset}
+        border:5px solid rgb(170, 255, 127); border-style:outset;border-radius: 20px;}
         QPushButton:hover { color: rgb(59,42,127)}
         '''
         )
+        # 마우스 포인터 변경
+        self.OK_button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        
         #3. 노랑
         
         #self.OK_button.setStyleSheet(
@@ -100,26 +118,38 @@ class Ui_Login(object):
 
         # id_lineEdit 속성 지정
         self.id_lineEdit = QLineEdit(Login)
-        self.id_lineEdit.setGeometry(QtCore.QRect(420, 620, 341, 51))
+        self.id_lineEdit.setGeometry(QtCore.QRect(400, 620, 341, 51))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.id_lineEdit.setFont(font)
         self.id_lineEdit.setObjectName("id_lineEdit")
         
+        self.id_lineEdit.setStyleSheet(
+        '''
+        background:white;
+        ''')
+        
         # label_1 속성 지정
         self.label = QtWidgets.QLabel(Login)
-        self.label.setGeometry(QtCore.QRect(2, 0, 891, 601))
+        self.label.setGeometry(QtCore.QRect(2, 0, 891, 588))
         self.label.setText("")
         self.label.setPixmap(QtGui.QPixmap("images/notice.png"))
+        
+        self.label.setStyleSheet(
+        '''
+        background: white;
+        '''
+        )
+        
         self.label.setObjectName("label")
         
         # label_2 속성 지정
         self.label_2 = QtWidgets.QLabel(Login)
-        self.label_2.setGeometry(QtCore.QRect(160, 620, 241, 55))
-        self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap("images/ID입력.png"))
-        self.label_2.setObjectName("label_2")
+        self.label_2.setGeometry(QtCore.QRect(240, 618, 140, 56))
         
+        self.label_2.setText("")
+        self.label_2.setPixmap(QtGui.QPixmap("images/kakao_id.png"))
+        self.label_2.setObjectName("label_2")
         self.retranslateUi(Login)
         QtCore.QMetaObject.connectSlotsByName(Login)
 

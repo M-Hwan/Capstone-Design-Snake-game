@@ -9,7 +9,7 @@
 # 주연 (창 연결, 디자인 추가)
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtGui import QCursor, QIcon, QColor
 
 class Ui_Rules(object):
 
@@ -18,26 +18,38 @@ class Ui_Rules(object):
         import snake
         #MainWindow.hide()
         print('뱀 게임 시작')
-        
 
     def setupUi(self, MainWindow):
+        # 윈도우 아이콘 설정
+        MainWindow.setWindowIcon(QIcon('images\game_logo.png'))
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1139, 806)
+        MainWindow.resize(1137, 920)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
+        MainWindow.setStyleSheet(
+        '''
+        background-image: url(images/back.png);
+        background-repeat: no-repeat;
+        '''
+        )
         # 이미지 label 설정
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(2, 0, 1135, 650))
+        self.label.setGeometry(QtCore.QRect(2, 10, 1135, 732))
         self.label.setPixmap(QtGui.QPixmap("images/game_rules.png"))
         self.label.setScaledContents(True)
+        self.label.setStyleSheet(
+        '''
+        background: white;
+        '''
+        )
         #self.label.setWordWrap(False)
         #self.label.setOpenExternalLinks(True)
         self.label.setObjectName("label")
 
         # 게임 시작 버튼 설정
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(440, 670, 291, 71))
+        self.pushButton.setGeometry(QtCore.QRect(440, 750, 330, 80))
         self.pushButton.setObjectName("pushButton")
         font = QtGui.QFont()
         font.setPointSize(17)
@@ -47,35 +59,18 @@ class Ui_Rules(object):
         self.pushButton.setStyleSheet(
         '''
         QPushButton { color:white; background:rgb(255, 208, 20);
-        border:5px solid rgb(255, 227, 111); border-style:outset}
-        QPushButton:hover { color: rgb(59,42,127)}
+        border:5px solid rgb(255, 227, 111); border-style:outset;
+        border-radius: 25px;}
+        QPushButton:hover { color: rgb(59,42,127);}
         '''
         )
-
+        # 마우스 포인터 변경
+        self.pushButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        
         #self.pushButton.raise_()
         #self.label.raise_()
 
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1139, 26))
-        self.menubar.setObjectName("menubar")
-        self.menu = QtWidgets.QMenu(self.menubar)
-        self.menu.setObjectName("menu")
-        self.menu_2 = QtWidgets.QMenu(self.menubar)
-        self.menu_2.setObjectName("menu_2")
-        self.menu_3 = QtWidgets.QMenu(self.menubar)
-        self.menu_3.setObjectName("menu_3")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.action = QtWidgets.QAction(MainWindow)
-        self.action.setObjectName("action")
-        self.menu.addAction(self.action)
-        self.menubar.addAction(self.menu.menuAction())
-        self.menubar.addAction(self.menu_2.menuAction())
-        self.menubar.addAction(self.menu_3.menuAction())
-        
         # 게임 시작 버튼 이벤트 핸들러
         self.pushButton.clicked.connect(self.game_start_btn)
 
@@ -84,14 +79,8 @@ class Ui_Rules(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "게임 조작법"))
         self.pushButton.setText(_translate("MainWindow", "게임 시작하기"))
-        self.menu.setTitle(_translate("MainWindow", "파일"))
-        self.menu_2.setTitle(_translate("MainWindow", "보기"))
-        self.menu_3.setTitle(_translate("MainWindow", "도움말"))
-        self.action.setText(_translate("MainWindow", "다시하기"))
-
-
 
 if __name__ == "__main__":
     import sys
